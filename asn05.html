@@ -9,12 +9,12 @@ Points Data: <input type="file" id="pointsdata" name="file" /> <br/>
 Line Data: <input type="file" id="linedata" name="file" /> <br/>
 
 <button onclick="readPointsFile()">Display Contents</button> <br/> <br/>
-<button onclick="translateUp()">Translate Up</button>
-<button onclick="translateDown()">Translate Down</button> <br/>
-<button onclick="translateLeft()">Translate Left</button>
-<button onclick="translateRight()">Translate Right</button> <br/> <br/>
-<button onclick="scaleUp()">Scale Up</button>
-<button onclick="scaleDown()">Scale Down</button> <br /> <br/>
+<button onclick="translateY(35)">Translate Up</button>
+<button onclick="translateY(-35)">Translate Down</button> <br/>
+<button onclick="translateLeft(-75)">Translate Left</button>
+<button onclick="translateRight(75)">Translate Right</button> <br/> <br/>
+<button onclick="scale(1.1)">Scale Up</button>
+<button onclick="scale(0.9)">Scale Down</button> <br /> <br/>
 <button onclick="rotateX()">Rotate X</button> <br /> 
 <button onclick="rotateY()">Rotate Y</button> <br /> 
 <button onclick="rotateZ()">Rotate Z</button><br/><br/>
@@ -39,14 +39,14 @@ var points;
 var lines;
 var transMatrix = new Array(3); //current translation matrix
     
-function translateUp() {
+function translateY(n) {
     
     // [ 1 0 0 0 ]
     // [ 0 1 0 0 ]
     // [ 0 0 1 0 ]
-    // [ 0 35 0 1 ]
+    // [ 0 n 0 1 ]
     
-    transMatrix[3][1] = 35;
+    transMatrix[3][1] = n;
     
     matrixMultiply();
     
@@ -54,29 +54,14 @@ function translateUp() {
     transMatrix[3][1] = 0;
 }
     
-function translateDown() {
+function translateX(n) {
     
     // [ 1 0 0 0 ]
     // [ 0 1 0 0 ]
     // [ 0 0 1 0 ]
-    // [ 0 -35 0 1 ]
+    // [ n 0 0 1 ]
     
-    transMatrix[3][1] = -35;
-    
-    matrixMultiply();
-    
-    //redraw()
-    transMatrix[3][1] = 0;
-}
-    
-function translateLeft() {
-    
-    // [ 1 0 0 0 ]
-    // [ 0 1 0 0 ]
-    // [ 0 0 1 0 ]
-    // [ 75 0 0 1 ]
-    
-    transMatrix[3][0] = 75;
+    transMatrix[3][0] = n;
     
     matrixMultiply();
     
@@ -84,22 +69,46 @@ function translateLeft() {
     transMatrix[3][0] = 0;
 }
 
-function translateDown() {
+function scale(n) {
+    
+    //move back to origin, assuming that point '0' is the center of the object
+    transMatrix[3][0] -= points[0][0];
+    transMatrix[3][1] -= points[0][1];
     
     // [ 1 0 0 0 ]
     // [ 0 1 0 0 ]
     // [ 0 0 1 0 ]
-    // [ -75 0 0 1 ]
-    
-    transMatrix[3][0] = -75;
+    // [ -x -y 0 1 ]
     
     matrixMultiply();
     
-    //redraw()
-    transMatrix[3][0] = 0;
+    //return, then scale factor
+    transMatrix[3][0] += points[0][0];
+    transMatrix[3][1] += points[0][1];
+    
+    // [ n 0 0 0 ]
+    // [ 0 n 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ 0 0 0 1 ]
+    
+    transMatrix[0][0] = n;
+    transMatrix[1][1] = n;
+    
+    matrixMultiply();
+    
+    //return to original position
+    transMatrix[3][0] += points[0][0];
+    transMatrix[3][1] += points[0][1];
+    
+    // [ 1 0 0 0 ]
+    // [ 0 1 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ +x +y 0 1 ]
+    
+    matrixMultiply();
 }
-     
-
+    
+//multiplies the 'points' array with the current translation Matrix
 function matrixMultiply() {
     
     for (var i = 0; typeof points[i] !== 'undefined'; i++) {
@@ -112,7 +121,6 @@ function matrixMultiply() {
         points[i][3] = points[i][0]*transMatrix[0][3] + points[i][1]*transMatrix[1][3] 
             + points[i][2]*transMatrix[2][3] + points[i][3]*transMatrix[3][3];
     }
-    
 }
     
 // initial draw function
