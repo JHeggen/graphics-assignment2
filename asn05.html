@@ -7,9 +7,23 @@
 <body>
 Points Data: <input type="file" id="pointsdata" name="file" /> <br/>
 Line Data: <input type="file" id="linedata" name="file" /> <br/>
-<span class="readBytesButtons">
-  <button>Display Contents</button>
-</span>
+
+<button onclick="readPointsFile()">Display Contents</button> <br/> <br/>
+<button onclick="translateUp()">Translate Up</button>
+<button onclick="translateDown()">Translate Down</button> <br/>
+<button onclick="translateLeft()">Translate Left</button>
+<button onclick="translateRight()">Translate Right</button> <br/> <br/>
+<button onclick="scaleUp()">Scale Up</button>
+<button onclick="scaleDown()">Scale Down</button> <br /> <br/>
+<button onclick="rotateX()">Rotate X</button> <br /> 
+<button onclick="rotateY()">Rotate Y</button> <br /> 
+<button onclick="rotateZ()">Rotate Z</button><br/><br/>
+<button onclick="contRotateX()">Continuous Rotate X</button><br/>
+<button onclick="contRotateY()">Continuous Rotate Y</button> <br/>
+<button onclick="contRotateZ()">Continuous Rotate Z</button><br/><br/>
+<button onclick="shearLeft()">Shear Left</button>
+<button onclick="shearRight()">Shear Right</button> <br /> <br/>
+
 <div id="points_content"></div>
 <div id="line_content"></div>
     
@@ -21,12 +35,102 @@ Your browser does not support the canvas element.
 </html>
 
 <script>
-function draw() {
+var points;
+var lines;
+var transMatrix = new Array(3); //current translation matrix
+    
+function translateUp() {
+    
+    // [ 1 0 0 0 ]
+    // [ 0 1 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ 0 35 0 1 ]
+    
+    transMatrix[3][1] = 35;
+    
+    matrixMultiply();
+    
+    //redraw()
+    transMatrix[3][1] = 0;
+}
+    
+function translateDown() {
+    
+    // [ 1 0 0 0 ]
+    // [ 0 1 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ 0 -35 0 1 ]
+    
+    transMatrix[3][1] = -35;
+    
+    matrixMultiply();
+    
+    //redraw()
+    transMatrix[3][1] = 0;
+}
+    
+function translateLeft() {
+    
+    // [ 1 0 0 0 ]
+    // [ 0 1 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ 75 0 0 1 ]
+    
+    transMatrix[3][0] = 75;
+    
+    matrixMultiply();
+    
+    //redraw()
+    transMatrix[3][0] = 0;
+}
+
+function translateDown() {
+    
+    // [ 1 0 0 0 ]
+    // [ 0 1 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ -75 0 0 1 ]
+    
+    transMatrix[3][0] = -75;
+    
+    matrixMultiply();
+    
+    //redraw()
+    transMatrix[3][0] = 0;
+}
+     
+
+function matrixMultiply() {
+    
+    for (var i = 0; typeof points[i] !== 'undefined'; i++) {
+        points[i][0] = points[i][0]*transMatrix[0][0] + points[i][1]*transMatrix[1][0] 
+            + points[i][2]*transMatrix[2][0] + points[i][3]*transMatrix[3][0];
+        points[i][1] = points[i][0]*transMatrix[0][1] + points[i][1]*transMatrix[1][1] 
+            + points[i][2]*transMatrix[2][1] + points[i][3]*transMatrix[3][1];
+        points[i][2] = points[i][0]*transMatrix[0][2] + points[i][1]*transMatrix[1][2] 
+            + points[i][2]*transMatrix[2][2] + points[i][3]*transMatrix[3][2];
+        points[i][3] = points[i][0]*transMatrix[0][3] + points[i][1]*transMatrix[1][3] 
+            + points[i][2]*transMatrix[2][3] + points[i][3]*transMatrix[3][3];
+    }
+    
+}
+    
+// initial draw function
+function firstDraw() {
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
     
     ctx.translate(0, canvas.height);
     ctx.scale(1, -1);
+    
+    // initialize translation matrix
+    transMatrix = new Array(3);
+    transMatrix[0] = [1, 0, 0, 0]; 
+    transMatrix[1] = [0, 1, 0, 0];
+    transMatrix[2] = [0, 0, 1, 0];
+    transMatrix[3] = [0, 0, 0, 1];
+        
+    console.log(points);
     
     // have to do something with newline in loop (2d vs 3d)
     //ctx.moveTo(0,0);
@@ -34,17 +138,18 @@ function draw() {
     //ctx.stroke();
     
     //only works for 2d
-    for (var i = 0; i < lines.length; i++) {
+    //for (var i = 0; i < lines.length; i++) {
         //ctx.moveTo(points[lines[i][0]][0], points[lines[i][0]][1]);
         //ctx.lineTo(points[lines[i][1]][0], points[lines[i][1]][1]);
         //ctx.stroke();
-    }
+    //}
 }
     
+// File reading and storing into arrays    
 function readPointsFile() {
 
     var files = document.getElementById('pointsdata').files;
-    var pointsarray = new Array(50);
+    points = new Array(70);
     
     if (!files.length) {
         alert('Please select a points file!'); 
@@ -55,7 +160,6 @@ function readPointsFile() {
         var start = 0;
         var stop = file.size - 1;
         var reader = new FileReader();
-        var points = new Array(50);
         
         reader.onloadend = function(evt) {
           if (evt.target.readyState == FileReader.DONE) { // DONE == 2 
@@ -72,15 +176,12 @@ function readPointsFile() {
               for (var j = 0; j < newlines.length; j++) {
                   if (newlines[j] == undefined) { return; }
                   var tmp = newlines[j].split(" ");
-                  points[j] = new Array(3);
+                  points[j] = new Array(4);
                   for (var k = 0; k < 3; k++) {
                       points[j][k] = parseFloat(tmp[k]);
+                      points[j][3] = 1; //homogeneous coordinates
                   }
-                  //console.log(points[j]);
               }
-              
-              //document.getElementById('points_content').innerHTML = points;
-              
           }
         };
 
@@ -89,12 +190,6 @@ function readPointsFile() {
         readLineFile();
     }
   }
-  
-  document.querySelector('.readBytesButtons').addEventListener('click', function(evt) {
-    if (evt.target.tagName.toLowerCase() == 'button') {
-      readPointsFile();
-    }
-  }, false);
     
 function readLineFile() {
 
@@ -105,7 +200,7 @@ function readLineFile() {
     var start = 0;
     var stop = file.size - 1;
     var reader = new FileReader();
-    var lines = new Array(50);
+    lines = new Array(50);
 
     // If we use onloadend, we need to check the readyState.
     reader.onloadend = function(evt) {
@@ -128,17 +223,13 @@ function readLineFile() {
                   tmp[k]--; //correspond to place in points array
                   lines[j][k] = parseFloat(tmp[k]);
               }
-              //console.log(lines[j]);
           }
-          
-         //document.getElementById('line_content').innerHTML = lines;
-          
       }
     };
 
     var blob = file.slice(start, stop + 1);
     reader.readAsBinaryString(blob);
-    draw();
+    firstDraw();
   }
     
 </script>
