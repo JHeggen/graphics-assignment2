@@ -23,7 +23,7 @@ Line Data: <input type="file" id="linedata" name="file" /> <br/>
 <button onclick="contRotateX()">Continuous Rotate X</button><br/>
 <button onclick="contRotateY()">Continuous Rotate Y</button> <br/>
 <button onclick="contRotateZ()">Continuous Rotate Z</button><br/>
-<button onclick="contRotateY()">Stop Rotation</button> <br/>
+<button onclick="stopContRotate()">Stop Rotation</button> <br/>
     
 <canvas id="myCanvas" style="border:1px solid #d3d3d3;">
 Your browser does not support the canvas element.
@@ -35,7 +35,9 @@ Your browser does not support the canvas element.
 <script>
 var points;
 var lines;
-var transMatrix = new Array(3); //current translation matrix
+var transMatrix; //current translation matrix
+    
+    //trying to use this guys' example: http://codentronix.com/2011/04/27/first-experiment-with-html5-a-wireframe-cube/
     
 function translateY(n) {
     
@@ -47,6 +49,7 @@ function translateY(n) {
     transMatrix[3][1] = n;
     
     matrixMultiply();
+    console.log(points);
     
     //redraw()
     //reset
@@ -63,6 +66,7 @@ function translateX(n) {
     transMatrix[3][0] = n;
     
     matrixMultiply();
+    console.log(points);
     
     //redraw()
     //reset
@@ -70,40 +74,114 @@ function translateX(n) {
 }
 
 function scale(n) {
+    var moveX = points[0][0];
+    var moveY = points[0][1];
+    var moveZ = points[0][2];
     
     //move back to origin assuming that point '0' is the center of the object
-    transMatrix[3][0] -= points[0][0];
-    transMatrix[3][1] -= points[0][1];
+    transMatrix[3][0] -= moveX;
+    transMatrix[3][1] -= moveY;
+    transMatrix[3][2] -= moveZ;
     
     //scale factor
     transMatrix[0][0] = n;
     transMatrix[1][1] = n;
-    
-    // [ n 0 0 0 ]
-    // [ 0 n 0 0 ]
-    // [ 0 0 1 0 ]
-    // [ -x -y 0 1 ]
+    transMatrix[2][2] = n;
+        
+    // [ n  0  0  0 ]
+    // [ 0  n  0  0 ]
+    // [ 0  0  n  0 ]
+    // [ -x -y -z 1 ]
     
     matrixMultiply();
-    resetMatrix();
     
     //return to original position
-    transMatrix[3][0] += points[0][0];
-    transMatrix[3][1] += points[0][1];
+    resetMatrix();
+    transMatrix[3][0] += moveX;
+    transMatrix[3][1] += moveY;
+    transMatrix[3][2] += moveZ;
     
-    // [ 1 0 0 0 ]
-    // [ 0 1 0 0 ]
-    // [ 0 0 1 0 ]
-    // [ +x +y 0 1 ]
+    // [ 1  0  0  0 ]
+    // [ 0  1  0  0 ]
+    // [ 0  0  1  0 ]
+    // [ +x +y +z 1 ]
     
     //redraw()
     matrixMultiply();
+    console.log(points);
     //reset
-    transMatrix[3][0] += 0;
-    transMatrix[3][1] += 0;
+    resetMatrix();
 }
     
 function shear(n) {
+    
+    // [ 1 ? 0 0 ]
+    // [ ? 1 0 0 ]
+    // [ 0 0 1 0 ]
+    // [ 0 0 0 1 ]
+    
+}
+    
+function rotateX() {
+    // cos(.05r) = 1
+    // sin(.05r) = 0.05
+    
+    //r(x)
+    // [ 1  0   0   0 ]
+    // [ 0  1  -.05 0 ]
+    // [ 0  .05  1  0 ]
+    // [ 0   0   0  1 ]
+    
+}
+    
+function rotateY() {
+    // cos(.05r) = 1
+    // sin(.05r) = 0.05
+    
+    //r(y)
+    // [  1   0  .05  0 ]
+    // [  0   1   0   0 ]
+    // [ -.05 0   1   0 ]
+    // [  0   0   0   1 ]
+    
+}
+    
+function rotateZ() {
+    // cos(.05r) = 1
+    // sin(.05r) = 0.05
+
+    //r(z)
+    // [  1   0  .05  0 ]
+    // [  0   1   0   0 ]
+    // [ -.05 0   1   0 ]
+    // [  0   0   0   1 ]
+    
+}
+    
+function contRotateX() {
+    
+    // while (something)
+    // call rotateX repeatedly
+    
+}
+    
+function contRotateX() {
+    
+    // while (something)
+    // call rotateY repeatedly
+    
+}
+    
+function contRotateX() {
+    
+    // while (something)
+    // call rotateY repeatedly
+    
+}
+    
+function stopContRotate() {
+    
+    // stop it somehow lol
     
 }
     
@@ -132,8 +210,10 @@ function resetMatrix() {
 // initial draw function
 function firstDraw() {
     var canvas = document.getElementById("myCanvas");
+    canvas.width = 200;
+    canvas.height = 200;
     var ctx = canvas.getContext("2d");
-    
+
     ctx.translate(0, canvas.height);
     ctx.scale(1, -1);
     
@@ -145,14 +225,13 @@ function firstDraw() {
     
     // have to do something with newline in loop (2d vs 3d)
     //ctx.moveTo(0,0);
-    //ctx.lineTo(200,100);
+    //ctx.lineTo(200,200);
     //ctx.stroke();
     
-    //only works for 2d
-    //for (var i = 0; i < lines.length; i++) {
-        //ctx.moveTo(points[lines[i][0]][0], points[lines[i][0]][1]);
-        //ctx.lineTo(points[lines[i][1]][0], points[lines[i][1]][1]);
-        //ctx.stroke();
+    //for (var i = 0; typeof lines[i] !== 'undefined'; i++) {
+    //    ctx.moveTo(points[lines[i][0]][0], points[lines[i][0]][1]);
+    //    ctx.lineTo(points[lines[i][1]][0], points[lines[i][1]][1]);
+    //    ctx.stroke();
     //}
 }
     
@@ -231,7 +310,6 @@ function readLineFile() {
               var tmp = newlines[j].split(" ");
               lines[j] = new Array(2);
               for (var k = 0; k < 2; k++) {
-                  tmp[k]--; //correspond to place in points array
                   lines[j][k] = parseFloat(tmp[k]);
               }
           }
