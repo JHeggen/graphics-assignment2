@@ -11,8 +11,8 @@ Line Data: <input type="file" id="linedata" name="file" /> <br/>
 <button onclick="readPointsFile()">Display Contents</button> <br/> <br/>
 <button onclick="translateY(35)">Translate Up</button>
 <button onclick="translateY(-35)">Translate Down</button> <br/>
-<button onclick="translateLeft(-75)">Translate Left</button>
-<button onclick="translateRight(75)">Translate Right</button> <br/> <br/>
+<button onclick="translateX(-75)">Translate Left</button>
+<button onclick="translateX(75)">Translate Right</button> <br/> <br/>
 <button onclick="scale(1.1)">Scale Up</button>
 <button onclick="scale(0.9)">Scale Down</button> <br /> <br/>
 <button onclick="rotateX()">Rotate X</button> <br /> 
@@ -71,7 +71,7 @@ function translateX(n) {
 
 function scale(n) {
     
-    //move back to origin, assuming that point '0' is the center of the object
+    //move back to origin assuming that point '0' is the center of the object
     transMatrix[3][0] -= points[0][0];
     transMatrix[3][1] -= points[0][1];
     
