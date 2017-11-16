@@ -15,17 +15,15 @@ Line Data: <input type="file" id="linedata" name="file" /> <br/>
 <button onclick="translateX(75)">Translate Right</button> <br/> <br/>
 <button onclick="scale(1.1)">Scale Up</button>
 <button onclick="scale(0.9)">Scale Down</button> <br /> <br/>
+<button onclick="shear(1)">Shear Left</button>
+<button onclick="shear(1)">Shear Right</button> <br /> <br/>
 <button onclick="rotateX()">Rotate X</button> <br /> 
 <button onclick="rotateY()">Rotate Y</button> <br /> 
 <button onclick="rotateZ()">Rotate Z</button><br/><br/>
 <button onclick="contRotateX()">Continuous Rotate X</button><br/>
 <button onclick="contRotateY()">Continuous Rotate Y</button> <br/>
-<button onclick="contRotateZ()">Continuous Rotate Z</button><br/><br/>
-<button onclick="shearLeft()">Shear Left</button>
-<button onclick="shearRight()">Shear Right</button> <br /> <br/>
-
-<div id="points_content"></div>
-<div id="line_content"></div>
+<button onclick="contRotateZ()">Continuous Rotate Z</button><br/>
+<button onclick="contRotateY()">Stop Rotation</button> <br/>
     
 <canvas id="myCanvas" style="border:1px solid #d3d3d3;">
 Your browser does not support the canvas element.
@@ -51,6 +49,7 @@ function translateY(n) {
     matrixMultiply();
     
     //redraw()
+    //reset
     transMatrix[3][1] = 0;
 }
     
@@ -66,6 +65,7 @@ function translateX(n) {
     matrixMultiply();
     
     //redraw()
+    //reset
     transMatrix[3][0] = 0;
 }
 
@@ -75,26 +75,17 @@ function scale(n) {
     transMatrix[3][0] -= points[0][0];
     transMatrix[3][1] -= points[0][1];
     
-    // [ 1 0 0 0 ]
-    // [ 0 1 0 0 ]
-    // [ 0 0 1 0 ]
-    // [ -x -y 0 1 ]
-    
-    matrixMultiply();
-    
-    //return, then scale factor
-    transMatrix[3][0] += points[0][0];
-    transMatrix[3][1] += points[0][1];
+    //scale factor
+    transMatrix[0][0] = n;
+    transMatrix[1][1] = n;
     
     // [ n 0 0 0 ]
     // [ 0 n 0 0 ]
     // [ 0 0 1 0 ]
-    // [ 0 0 0 1 ]
-    
-    transMatrix[0][0] = n;
-    transMatrix[1][1] = n;
+    // [ -x -y 0 1 ]
     
     matrixMultiply();
+    resetMatrix();
     
     //return to original position
     transMatrix[3][0] += points[0][0];
@@ -105,7 +96,15 @@ function scale(n) {
     // [ 0 0 1 0 ]
     // [ +x +y 0 1 ]
     
+    //redraw()
     matrixMultiply();
+    //reset
+    transMatrix[3][0] += 0;
+    transMatrix[3][1] += 0;
+}
+    
+function shear(n) {
+    
 }
     
 //multiplies the 'points' array with the current translation Matrix
@@ -123,6 +122,13 @@ function matrixMultiply() {
     }
 }
     
+function resetMatrix() {
+    transMatrix[0] = [1, 0, 0, 0]; 
+    transMatrix[1] = [0, 1, 0, 0];
+    transMatrix[2] = [0, 0, 1, 0];
+    transMatrix[3] = [0, 0, 0, 1];
+}
+    
 // initial draw function
 function firstDraw() {
     var canvas = document.getElementById("myCanvas");
@@ -133,10 +139,7 @@ function firstDraw() {
     
     // initialize translation matrix
     transMatrix = new Array(3);
-    transMatrix[0] = [1, 0, 0, 0]; 
-    transMatrix[1] = [0, 1, 0, 0];
-    transMatrix[2] = [0, 0, 1, 0];
-    transMatrix[3] = [0, 0, 0, 1];
+    resetMatrix();
         
     console.log(points);
     
