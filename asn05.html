@@ -10,10 +10,10 @@ Line Data: <input type="file" id="linedata" name="file" /> <br/>
 
 <button onclick="readPointsFile()">Save</button>
 <button onclick="draw()">Draw</button><br/> <br/>
-<button onclick="translateY(35)">Translate Up</button>
-<button onclick="translateY(-35)">Translate Down</button> <br/>
-<button onclick="translateX(-75)">Translate Left</button>
-<button onclick="translateX(75)">Translate Right</button> <br/> <br/>
+<button onclick="translateY(3.5)">Translate Up</button>
+<button onclick="translateY(-3.5)">Translate Down</button> <br/>
+<button onclick="translateX(-7.5)">Translate Left</button>
+<button onclick="translateX(7.5)">Translate Right</button> <br/> <br/>
 <button onclick="scale(1.1)">Scale Up</button>
 <button onclick="scale(0.9)">Scale Down</button> <br /> <br/>
 <button onclick="shear(1)">Shear Left</button>
@@ -35,6 +35,7 @@ Your browser does not support the canvas element.
 
 <script>
 var points;
+var center;
 var lines;
 var transMatrix; //current translation matrix
     
@@ -105,8 +106,8 @@ function scale(n) {
     // [ 0  0  1  0 ]
     // [ +x +y +z 1 ]
     
-    //draw()
     matrixMultiply();
+    draw()
     console.log(points);
     //reset
     resetMatrix();
@@ -184,6 +185,31 @@ function stopContRotate() {
     
 }
     
+function calculateCenter() {
+    center = new Array (2);
+    var tmpX = 0, tmpY = 0, tmpZ = 0;
+    
+    for (var i = 0; typeof points[i] !== 'undefined'; i++) {
+        
+        if (points[i][0] > tmpX) {
+            tmpX = points[i][0];
+        }
+        
+        if (points[i][1] > tmpY) {
+            tmpY = points[i][1];
+        }
+        
+        if (points[i][2] > tmpZ) {
+            tmpZ = points[i][2];
+        }
+        
+    }
+    
+    center = [tmpX/2, tmpY/2, tmpZ/2];
+    console.log(center);
+    
+}
+    
 //multiplies the 'points' array with the current translation Matrix
 function matrixMultiply() {
     
@@ -206,7 +232,7 @@ function resetMatrix() {
     transMatrix[3] = [0, 0, 0, 1];
 }
     
-function transform3d() {
+function transform3d(i) {
     var pointX = points[i][0], pointY = points[i][1], pointZ = points[i][2];
     var newX, newY;
 
@@ -215,8 +241,10 @@ function transform3d() {
 function draw() {
     var canvas = document.getElementById("myCanvas");
     var ctx = canvas.getContext("2d");
-    canvas.width = 200;
-    canvas.height = 200;
+    canvas.width = 400;
+    canvas.height = 400;
+    
+    calculateCenter();
     
     /* //background color
     ctx.fillStyle = "rgb(0,0,0)";
@@ -226,13 +254,12 @@ function draw() {
     ctx.scale(1, -1);
     ctx.strokeStyle = "rgb(0,0,0)"
     
-    var t = points;
+    var t = new Array(70);
 
-    /*for (var i = 0; typeof points[i] !== 'undefined'; i++) {
+    for (var i = 0; typeof points[i] !== 'undefined'; i++) {
+        t[i] = [Math.sqrt(points[i][0]*points[i][0]), points[i][1]];
         console.log(points[i]);
-        t[i] = transform3d(i, 200, 200, 100, 10);
-        console.log(points[i]);
-    }*/
+    }
     
     for(var i = 0; typeof lines[i] !== 'undefined'; i++ ) {
         var startX = Math.round(points[lines[i][0]][0]);
