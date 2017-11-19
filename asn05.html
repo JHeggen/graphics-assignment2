@@ -8,7 +8,8 @@
 Points Data: <input type="file" id="pointsdata" name="file" /> <br/>
 Line Data: <input type="file" id="linedata" name="file" /> <br/>
 
-<button onclick="readPointsFile()">Display Contents</button> <br/> <br/>
+<button onclick="readPointsFile()">Save</button>
+<button onclick="draw()">Draw</button><br/> <br/>
 <button onclick="translateY(35)">Translate Up</button>
 <button onclick="translateY(-35)">Translate Down</button> <br/>
 <button onclick="translateX(-75)">Translate Left</button>
@@ -37,8 +38,6 @@ var points;
 var lines;
 var transMatrix; //current translation matrix
     
-    //trying to use this guys' example: http://codentronix.com/2011/04/27/first-experiment-with-html5-a-wireframe-cube/
-    
 function translateY(n) {
     
     // [ 1 0 0 0 ]
@@ -51,7 +50,7 @@ function translateY(n) {
     matrixMultiply();
     console.log(points);
     
-    //redraw()
+    draw()
     //reset
     transMatrix[3][1] = 0;
 }
@@ -68,7 +67,7 @@ function translateX(n) {
     matrixMultiply();
     console.log(points);
     
-    //redraw()
+    draw()
     //reset
     transMatrix[3][0] = 0;
 }
@@ -106,7 +105,7 @@ function scale(n) {
     // [ 0  0  1  0 ]
     // [ +x +y +z 1 ]
     
-    //redraw()
+    //draw()
     matrixMultiply();
     console.log(points);
     //reset
@@ -207,32 +206,52 @@ function resetMatrix() {
     transMatrix[3] = [0, 0, 0, 1];
 }
     
-// initial draw function
-function firstDraw() {
+function transform3d() {
+    var pointX = points[i][0], pointY = points[i][1], pointZ = points[i][2];
+    var newX, newY;
+
+}
+  
+function draw() {
     var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
     canvas.width = 200;
     canvas.height = 200;
-    var ctx = canvas.getContext("2d");
-
+    
+    /* //background color
+    ctx.fillStyle = "rgb(0,0,0)";
+    ctx.fillRect(0,0,200,200); */
+    
     ctx.translate(0, canvas.height);
     ctx.scale(1, -1);
+    ctx.strokeStyle = "rgb(0,0,0)"
     
-    // initialize translation matrix
-    transMatrix = new Array(3);
-    resetMatrix();
+    var t = points;
+
+    /*for (var i = 0; typeof points[i] !== 'undefined'; i++) {
+        console.log(points[i]);
+        t[i] = transform3d(i, 200, 200, 100, 10);
+        console.log(points[i]);
+    }*/
+    
+    for(var i = 0; typeof lines[i] !== 'undefined'; i++ ) {
+        var startX = Math.round(points[lines[i][0]][0]);
+        var startY = Math.round(points[lines[i][0]][1]);
+        var endX = Math.round(points[lines[i][1]][0]);
+        var endY = Math.round(points[lines[i][1]][1]);
         
-    console.log(points);
-    
-    // have to do something with newline in loop (2d vs 3d)
-    //ctx.moveTo(0,0);
-    //ctx.lineTo(200,200);
-    //ctx.stroke();
-    
-    //for (var i = 0; typeof lines[i] !== 'undefined'; i++) {
-    //    ctx.moveTo(points[lines[i][0]][0], points[lines[i][0]][1]);
-    //    ctx.lineTo(points[lines[i][1]][0], points[lines[i][1]][1]);
-    //    ctx.stroke();
-    //}
+        //console.log(startX);
+        //console.log(startY);
+        //console.log(endX);
+        //console.log(endY);
+        
+        ctx.beginPath();
+        ctx.moveTo(startX*10,startY*10);
+        ctx.lineTo(endX*10,endY*10);
+        ctx.closePath();
+        ctx.stroke();
+        
+    }
 }
     
 // File reading and storing into arrays    
@@ -318,7 +337,8 @@ function readLineFile() {
 
     var blob = file.slice(start, stop + 1);
     reader.readAsBinaryString(blob);
-    firstDraw();
+    transMatrix = new Array(3);
+    resetMatrix();
   }
     
 </script>
