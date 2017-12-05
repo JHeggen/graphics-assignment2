@@ -2,22 +2,38 @@
 <html lang="en">
 <head>
 <title>Graphics - Assignment 5</title>
-<link rel="stylesheet" type="text/css"  href="style.css">
+    
+    <style>
+    canvas {
+        position: absolute;
+        top:0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 60%;
+        height: 60%;
+        margin:auto;
+    }
+    </style>
+    
+    
 </head>
 <body>
+<p>Load files, then press 'save', then 'draw'. To reset the canvas, press 'save' and 'draw' again.
+   <br/>Window may need to be resized for proper scaling.</p>
+    
 Points Data: <input type="file" id="pointsdata" name="file" /> <br/>
 Line Data: <input type="file" id="linedata" name="file" /> <br/>
 
 <button onclick="readPointsFile()">Save</button>
-<button onclick="draw()">Draw</button>
-<button onclick="lab8draw()">Draw Lab 8</button><br/> <br/>
-<button onclick="translateY(3.5)">Translate Up</button>
+<button onclick="draw()">Draw</button> <br/><br/>
+<button onclick="translateY(3.5)">Translate Up</button> <br/>
 <button onclick="translateY(-3.5)">Translate Down</button> <br/>
-<button onclick="translateX(-7.5)">Translate Left</button>
+<button onclick="translateX(-7.5)">Translate Left</button> <br/>
 <button onclick="translateX(7.5)">Translate Right</button> <br/> <br/>
-<button onclick="scale(1.1)">Scale Up</button>
+<button onclick="scale(1.1)">Scale Up</button> <br/>
 <button onclick="scale(0.9)">Scale Down</button> <br /> <br/>
-<button onclick="shear(-1)">Shear Left</button>
+<button onclick="shear(-1)">Shear Left</button> <br/>
 <button onclick="shear(1)">Shear Right</button> <br /> <br/>
 <button onclick="rotateX()">Rotate X</button> <br /> 
 <button onclick="rotateY()">Rotate Y</button> <br /> 
@@ -30,6 +46,13 @@ Line Data: <input type="file" id="linedata" name="file" /> <br/>
 <canvas id="myCanvas" style="border:1px solid #d3d3d3;">
 Your browser does not support the canvas element.
 </canvas>
+    
+    <footer><p>
+    Jonathan Heggen <br/>
+    [A00840322 - Set T] <br/> <br/>
+    Paul Kao <br/>
+    [A00907981 - Set R] <br/>
+    </p></footer>
     
 </body>
 </html>
